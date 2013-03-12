@@ -28,10 +28,11 @@ PROJECTRELATIVE_PATH = src
 O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 
 # Object files for local .cc and .msg files
-OBJS = $O/Txc.o
+OBJS = $O/PacketGenerator.o $O/Txc.o $O/SimplePacket_m.o
 
 # Message files
-MSGFILES =
+MSGFILES = \
+    SimplePacket.msg
 
 #------------------------------------------------------------------------------
 
@@ -109,6 +110,12 @@ depend:
 	$(MAKEDEPEND) $(INCLUDE_PATH) -f Makefile -P\$$O/ -- $(MSG_CC_FILES)  ./*.cc
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
+$O/PacketGenerator.o: PacketGenerator.cc \
+	PacketGenerator.h \
+	PacketPriority.h \
+	SimplePacket_m.h
+$O/SimplePacket_m.o: SimplePacket_m.cc \
+	SimplePacket_m.h
 $O/Txc.o: Txc.cc \
 	Txc.h
 
