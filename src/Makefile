@@ -28,7 +28,7 @@ PROJECTRELATIVE_PATH = src
 O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 
 # Object files for local .cc and .msg files
-OBJS = $O/PacketGenerator.o $O/Txc.o $O/SimplePacket_m.o
+OBJS = $O/PacketGenerator.o $O/PoissonPacketGenerator.o $O/Txc.o $O/SimplePacket_m.o
 
 # Message files
 MSGFILES = \
@@ -113,6 +113,11 @@ depend:
 $O/PacketGenerator.o: PacketGenerator.cc \
 	PacketGenerator.h \
 	PacketPriority.h \
+	SimplePacket_m.h
+$O/PoissonPacketGenerator.o: PoissonPacketGenerator.cc \
+	PacketGenerator.h \
+	PacketPriority.h \
+	PoissonPacketGenerator.h \
 	SimplePacket_m.h
 $O/SimplePacket_m.o: SimplePacket_m.cc \
 	SimplePacket_m.h

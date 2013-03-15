@@ -18,35 +18,52 @@
 
 #include <SimplePacket_m.h>
 #include <PacketPriority.h>
+#include <omnetpp.h>
 
 namespace omnetpptrafficgenerators {
 
-class PacketGenerator {
+class PacketGenerator : public cSimpleModule {
 public:
     PacketGenerator();
-    PacketGenerator(int delayBeetweenPackets, int packetsLength, int sessionLength, PacketPriority packetsPriority);
+    PacketGenerator(int packetsNumber, int delayBeetweenPackets, int packetsLength, int sessionLength, PacketPriority packetsPriority);
     virtual ~PacketGenerator();
 
-    virtual SimplePacket generatePacket();  // to override
+    SimplePacket *generatePacket();  // to override
 
+    void setPacketsNumber(int packetsNum);
     void setDelayBeetweenPackets(int delay);
     void setPacketsLength(int len);
     void setSessionLength(int len);
     void setPacketsPriority(PacketPriority priority);
 
+    int getPacketsNumber();
     int getDelayBeetweenPackets();
     int getPacketsLength();
     int getSessionLength();
     int getPacketsPriority();
 
-private:
+
+protected:
+    virtual void initialize();
+    virtual void handleMessage(cMessage *msg);
+    virtual void finish();
+
+
+    SimplePacket *generatedPacket;
+
+    int _packetsNumber;
+    int _packetsCount;
+
     //PARAMS:
     int _delayBeetweenPackets;
     int _packetsLength;
     int _sessionLength;
     PacketPriority _packetsPriority;
 
+
 };
+
+Define_Module(PacketGenerator);
 
 } /* namespace omnetpptrafficgenerators */
 #endif /* PACKETGENERATOR_H_ */

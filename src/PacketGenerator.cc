@@ -14,15 +14,18 @@
 // 
 
 #include "PacketGenerator.h"
+#include <cstdio>
 
 namespace omnetpptrafficgenerators {
+
 
 PacketGenerator::PacketGenerator() {
     // TODO Auto-generated constructor stub
 
 }
 
-PacketGenerator::PacketGenerator(int delayBeetweenPackets, int packetsLength, int sessionLength, PacketPriority packetsPriority) {
+PacketGenerator::PacketGenerator(int packetsNumber, int delayBeetweenPackets, int packetsLength, int sessionLength, PacketPriority packetsPriority) {
+    this->_packetsNumber = packetsNumber;
     this->_delayBeetweenPackets = delayBeetweenPackets;
     this->_packetsLength = packetsLength;
     this->_sessionLength = sessionLength;
@@ -34,6 +37,10 @@ PacketGenerator::~PacketGenerator() {
 }
 
 } /* namespace omnetpptrafficgenerators */
+
+void PacketGenerator::setPacketsNumber(int packetsNum) {
+    this->_packetsNumber = packetsNum;
+}
 
 void PacketGenerator::setDelayBeetweenPackets(int delay) {
     this->_delayBeetweenPackets = delay;
@@ -49,6 +56,10 @@ void PacketGenerator::setSessionLength(int len) {
 
 void PacketGenerator::setPacketsPriority(PacketPriority priority) {
     this->_packetsPriority = priority;
+}
+
+int PacketGenerator::getPacketsNumber() {
+    return this->_packetsNumber;
 }
 
 int PacketGenerator::getDelayBeetweenPackets() {
@@ -67,6 +78,43 @@ int PacketGenerator::getPacketsPriority() {
     return this->_packetsPriority;
 }
 
-SimplePacket PacketGenerator::generatePacket() {
-    return NULL;
+SimplePacket *PacketGenerator::generatePacket() {
+    return new SimplePacket("generatedPacket");
+}
+
+void PacketGenerator::initialize() {
+    setPacketsNumber(100);  //TODO: get from params
+
+    this->_packetsCount = 0;
+    this->generatedPacket = new SimplePacket("selfMessage");
+    scheduleAt(simTime() + 1, this->generatedPacket);
+}
+
+void PacketGenerator::handleMessage(cMessage *msg) {
+    if (msg->isSelfMessage()) { // received self message
+        if (this->_packetsCount < this->_packetsNumber) {
+            this->generatedPacket = generatePacket();
+
+            scheduleAt(simTime() + 10.0, this->generatedPacket);  // send genrated message: scheduleAt() OR send()
+
+            this->generatedPacket = NULL; // remove after send
+
+            std::string buf;
+            sprintf((char*)buf.c_str(), "Message number %d generated", this->_packetsCount++);
+
+            EV << buf.c_str();
+            bubble(buf.c_str());
+        }
+
+    } else { // received true packet
+        // processing received packet....
+        SimplePacket *sPacket = check_and_cast<SimplePacket *>(msg);  // dynamic cast
+        sPacket = NULL;
+
+    }
+}
+
+void PacketGenerator::finish() {
+    if (this->generatedPacket != NULL)
+        delete this->generatedPacket;
 }
