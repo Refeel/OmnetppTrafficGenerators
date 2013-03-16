@@ -17,8 +17,8 @@
 #define PACKETGENERATOR_H_
 
 #include <SimplePacket_m.h>
-#include <PacketPriority.h>
 #include <omnetpp.h>
+#include <PacketPriority.h>
 
 namespace omnetpptrafficgenerators {
 
@@ -29,6 +29,7 @@ public:
     virtual ~PacketGenerator();
 
     SimplePacket *generatePacket();  // to override
+    void forwardPacket(SimplePacket *sp);
 
     void setPacketsNumber(int packetsNum);
     void setDelayBeetweenPackets(int delay);
@@ -42,14 +43,17 @@ public:
     int getSessionLength();
     int getPacketsPriority();
 
+    simtime_t getDelay();  // to override
+
 
 protected:
     virtual void initialize();
-    virtual void handleMessage(cMessage *msg);
+    virtual void handleMessage(cMessage *msg);  // to override
     virtual void finish();
 
 
     SimplePacket *generatedPacket;
+    cMessage *event; // pointer to the event object which we'll use for timing
 
     int _packetsNumber;
     int _packetsCount;

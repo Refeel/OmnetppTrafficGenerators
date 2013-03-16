@@ -27,15 +27,11 @@ public:
     PoissonPacketGenerator();
     virtual ~PoissonPacketGenerator();
 
-    SimplePacket *generatePacket(); // override
-
+    virtual SimplePacket *generatePacket(); // overrided
+    virtual simtime_t getDelay();   // overrided
 
 protected:
-    virtual void initialize();
-    virtual void handleMessage(cMessage *msg);
-    virtual void finish();
-
-    SimplePacket *generatedPacket;
+    virtual void handleMessage(cMessage *msg);  // overrided
 
 };
 

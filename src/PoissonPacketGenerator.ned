@@ -19,8 +19,8 @@ simple PoissonPacketGenerator
 {
 	parameters:
         int poissonDelayTime;
+        int packetsNumber;
         
     gates:
-        input in;
-        output out;
+        inout gate[];
 }

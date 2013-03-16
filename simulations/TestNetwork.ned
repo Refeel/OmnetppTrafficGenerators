@@ -14,9 +14,11 @@ import omnetpptrafficgenerators.PacketGenerator;
 
 simple PacketGenerator
 {
+    parameters:
+        int packetsNumber;
+        
     gates:
-        input in;
-        output out;
+        inout gate[];
 }
 
 //
@@ -25,12 +27,19 @@ simple PacketGenerator
 //
 network TestNetwork
 {
+    types:
+        channel Channel extends ned.DelayChannel {
+            delay = 100ms;
+        }
+        
     submodules:
-        tic: PacketGenerator;
-        toc: PacketGenerator;
+        tic[6]: PacketGenerator;
     connections:
-        tic.out --> {delay = 100ms;} --> toc.in;
-        tic.in <-- {delay = 100ms;} <-- toc.out;
+        tic[0].gate++ <--> Channel <--> tic[1].gate++;
+        tic[1].gate++ <--> Channel <--> tic[2].gate++;
+        tic[1].gate++ <--> Channel <--> tic[4].gate++;
+        tic[3].gate++ <--> Channel <--> tic[4].gate++;
+        tic[4].gate++ <--> Channel <--> tic[5].gate++;
 
 
 }

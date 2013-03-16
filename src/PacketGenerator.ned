@@ -17,7 +17,9 @@ package omnetpptrafficgenerators;
 
 simple PacketGenerator
 {
+    parameters:
+        int packetsNumber;
+        
     gates:
-        input in;
-        output out;
+        inout gate[];
 }

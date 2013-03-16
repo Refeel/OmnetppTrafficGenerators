@@ -14,6 +14,7 @@
 // 
 
 #include "PacketGenerator.h"
+#include <PacketPriority.h>
 #include <cstdio>
 
 namespace omnetpptrafficgenerators {
@@ -78,38 +79,84 @@ int PacketGenerator::getPacketsPriority() {
     return this->_packetsPriority;
 }
 
+simtime_t PacketGenerator::getDelay() {
+    return 10;
+}
+
 SimplePacket *PacketGenerator::generatePacket() {
-    return new SimplePacket("generatedPacket");
+
+    int src = getIndex();
+    int n = size();
+    int dest = intuniform(0,n-2);
+    if (dest>=src) dest++;
+
+    char msgname[20];
+    sprintf(msgname, "tic-%d-to-%d", src, dest);
+
+    SimplePacket *sp = new SimplePacket(msgname);
+
+    sp->setDST(dest);
+    sp->setSRC(src);
+    sp->setSessionId(0);
+    sp->setPacketId(this->_packetsCount++);
+    sp->setPriority(NORMAL);
+
+    return sp;
+}
+
+void PacketGenerator::forwardPacket(SimplePacket *sp) {
+
+    // Same routing as before: random gate.
+    int n = gateSize("gate");
+    int k = intuniform(0,n-1);
+
+    EV << "Forwarding packet " << sp << " on gate[" << k << "]\n";
+    send(sp, "gate$o", k);
 }
 
 void PacketGenerator::initialize() {
-    setPacketsNumber(100);  //TODO: get from params
+
+    this->event = new cMessage("event");
+    this->generatedPacket = NULL;
+
+    setPacketsNumber((int)par("packetsNumber"));
 
     this->_packetsCount = 0;
-    this->generatedPacket = new SimplePacket("selfMessage");
-    scheduleAt(simTime() + 1, this->generatedPacket);
+
+    scheduleAt(simTime() + 1, event);
 }
 
 void PacketGenerator::handleMessage(cMessage *msg) {
-    if (msg->isSelfMessage()) { // received self message
+    if (msg == event) { // received timing message
         if (this->_packetsCount < this->_packetsNumber) {
-            this->generatedPacket = generatePacket();
+            this->generatedPacket = generatePacket(); // generate periodic packet
 
-            scheduleAt(simTime() + 10.0, this->generatedPacket);  // send genrated message: scheduleAt() OR send()
+            forwardPacket(this->generatedPacket); // send to random node
 
             this->generatedPacket = NULL; // remove after send
 
-            std::string buf;
-            sprintf((char*)buf.c_str(), "Message number %d generated", this->_packetsCount++);
 
+            simtime_t delay = getDelay();
+            scheduleAt(simTime() + delay, event);
+
+            std::string buf;
+            sprintf((char*) buf.c_str(), "Packet number %d generated with delay %lf", this->_packetsCount++, delay.dbl());
             EV << buf.c_str();
             bubble(buf.c_str());
+
         }
 
     } else { // received true packet
         // processing received packet....
-        SimplePacket *sPacket = check_and_cast<SimplePacket *>(msg);  // dynamic cast
-        sPacket = NULL;
+        SimplePacket *sPacket = check_and_cast<SimplePacket *>(msg); // dynamic cast
+
+        if (sPacket->getDST() == getIndex()) {
+            EV << "Packet " << sPacket << " arrived\n";
+
+            delete sPacket;
+        } else {
+            forwardPacket(sPacket);
+        }
 
     }
 }
