@@ -54,21 +54,24 @@ SimplePacket *OnOffPacketGenerator::generatePacket() {
 void OnOffPacketGenerator::handleMessage(cMessage *msg) {
     this->updateState();
     if (msg == event) { // received timing message
-        if (_state == ON && this->_packetsCount < this->_packetsNumber) {
-            this->generatedPacket = generatePacket(); // generate periodic packet
-
-            forwardPacket(this->generatedPacket); // send to random node
-
-            this->generatedPacket = NULL; // remove after send
-
+        if (this->_packetsCount < this->_packetsNumber) {
 
             simtime_t delay = getDelay();
-            scheduleAt(simTime() + delay, event);
 
-            std::string buf;
-            sprintf((char*) buf.c_str(), "Packet number %d generated with delay %lf", this->_packetsCount++, delay.dbl());
-            EV << buf.c_str();
-            bubble(buf.c_str());
+            if(_state == ON) {
+                this->generatedPacket = generatePacket(); // generate periodic packet
+
+                forwardPacket(this->generatedPacket); // send to random node
+
+                this->generatedPacket = NULL; // remove after send
+
+                std::string buf;
+                sprintf((char*) buf.c_str(), "Packet number %d generated with delay %lf", this->_packetsCount, delay.dbl());
+                EV << buf.c_str();
+                bubble(buf.c_str());
+            }
+
+            scheduleAt(simTime() + delay, event);
 
         }
 

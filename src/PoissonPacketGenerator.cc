@@ -66,7 +66,7 @@ void PoissonPacketGenerator::handleMessage(cMessage *msg) {
             scheduleAt(simTime() + delay, event);
 
             std::string buf;
-            sprintf((char*) buf.c_str(), "Packet number %d generated with delay %lf", this->_packetsCount++, delay.dbl());
+            sprintf((char*) buf.c_str(), "Packet number %d generated with delay %lf", this->_packetsCount, delay.dbl());
             EV << buf.c_str();
             bubble(buf.c_str());
 
