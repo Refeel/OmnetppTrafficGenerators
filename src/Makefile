@@ -30,6 +30,7 @@ O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 # Object files for local .cc and .msg files
 OBJS = \
     $O/ExponentialPacketGenerator.o \
+    $O/MarkovPacketGenerator.o \
     $O/OnOffPacketGenerator.o \
     $O/PacketGenerator.o \
     $O/PoissonPacketGenerator.o \
@@ -118,6 +119,11 @@ depend:
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 $O/ExponentialPacketGenerator.o: ExponentialPacketGenerator.cc \
 	ExponentialPacketGenerator.h \
+	PacketGenerator.h \
+	PacketPriority.h \
+	SimplePacket_m.h
+$O/MarkovPacketGenerator.o: MarkovPacketGenerator.cc \
+	MarkovPacketGenerator.h \
 	PacketGenerator.h \
 	PacketPriority.h \
 	SimplePacket_m.h
