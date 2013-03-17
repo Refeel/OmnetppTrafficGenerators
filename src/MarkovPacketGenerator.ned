@@ -19,6 +19,11 @@ simple MarkovPacketGenerator
 {
 	parameters:
         int markovStateDurationTime;
+        int markovMinStateDurationTime;
+        int markovMaxStateDurationTime;
+        int statesNum;
+        int spaceBeetweenStates;
+        
         int packetsNumber;
         
     gates:

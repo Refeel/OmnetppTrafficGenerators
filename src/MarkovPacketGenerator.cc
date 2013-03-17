@@ -26,7 +26,7 @@ MarkovPacketGenerator::~MarkovPacketGenerator() {
 }
 
 simtime_t MarkovPacketGenerator::getDelay() {
-    simtime_t time = exponential(_lambda);
+    simtime_t time = poisson(_lambda);
     return time;
 }
 
@@ -67,9 +67,9 @@ void MarkovPacketGenerator::handleMessage(cMessage *msg) {
             this->generatedPacket = NULL; // remove after send
 
             std::string buf;
-                        sprintf((char*) buf.c_str(), "Packet number %d generated with delay %lf", this->_packetsCount, delay.dbl());
-                        EV << buf.c_str();
-                        bubble(buf.c_str());
+            sprintf((char*) buf.c_str(), "Packet number %d generated with delay %lf", this->_packetsCount, delay.dbl());
+            EV << buf.c_str();
+            bubble(buf.c_str());
 
         }
 
@@ -91,9 +91,9 @@ void MarkovPacketGenerator::handleMessage(cMessage *msg) {
 void MarkovPacketGenerator::updateState() {
     std::string buf;
     if(simTime() >= _stateEndTime) {
-        this->_stateEndTime = simTime()+par("markovStateDurationTime");
+        this->_stateEndTime = simTime()+ intuniform(500,1500); //par("markovStateDurationTime");
         sprintf((char*) buf.c_str(), "State changed, endTime = %lf \n", this->_stateEndTime.dbl());
-        _lambda=rand()%10+1;
+        _lambda = (rand()%((int)par("statesNum"))+1) * ((int)par("spaceBeetweenStates"));
         EV << buf.c_str();
         bubble(buf.c_str());
     }
