@@ -27,7 +27,7 @@ ExponentialPacketGenerator::~ExponentialPacketGenerator() {
 }
 
 simtime_t ExponentialPacketGenerator::getDelay() {
-    simtime_t time = par("exponentialDelayTime");
+    simtime_t time = exponential(20);//par("exponentialDelayTime");
     return time;
 }
 
@@ -64,10 +64,12 @@ void ExponentialPacketGenerator::handleMessage(cMessage *msg) {
 
 
             simtime_t delay = getDelay();
+            hist.collect(delay);
+            //vec.record(delay);
             scheduleAt(simTime() + delay, event);
 
             std::string buf;
-            sprintf((char*) buf.c_str(), "Packet number %d generated with delay %lf", this->_packetsCount++, delay.dbl());
+            sprintf((char*) buf.c_str(), "Packet number %d generated with delay %lf", this->_packetsCount, delay.dbl());
             EV << buf.c_str();
             bubble(buf.c_str());
 

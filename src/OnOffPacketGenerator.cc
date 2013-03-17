@@ -63,12 +63,18 @@ void OnOffPacketGenerator::handleMessage(cMessage *msg) {
 
                 forwardPacket(this->generatedPacket); // send to random node
 
+                hist.collect(delay.dbl() + sumDelay.dbl());
+                //vec.record(delay.dbl() + sumDelay.dbl());
+                sumDelay = 0;
+
                 this->generatedPacket = NULL; // remove after send
 
                 std::string buf;
                 sprintf((char*) buf.c_str(), "Packet number %d generated with delay %lf", this->_packetsCount, delay.dbl());
                 EV << buf.c_str();
                 bubble(buf.c_str());
+            } else {
+                sumDelay += delay;
             }
 
             scheduleAt(simTime() + delay, event);

@@ -30,8 +30,11 @@ public:
     virtual SimplePacket *generatePacket(); // overrided
     virtual simtime_t getDelay();   // overrided
 
+
+
 protected:
     virtual void handleMessage(cMessage *msg);  // overrided
+
 
 };
 

@@ -42,6 +42,7 @@ private:
     };
     State _state;
     simtime_t _stateEndTime;
+    simtime_t sumDelay;
 };
 
 Define_Module(OnOffPacketGenerator);

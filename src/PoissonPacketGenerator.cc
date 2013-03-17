@@ -27,7 +27,7 @@ PoissonPacketGenerator::~PoissonPacketGenerator() {
 }
 
 simtime_t PoissonPacketGenerator::getDelay() {
-    simtime_t time = par("poissonDelayTime");
+    simtime_t time = poisson(10);//par("poissonDelayTime");
     return time;
 }
 
@@ -63,6 +63,8 @@ void PoissonPacketGenerator::handleMessage(cMessage *msg) {
 
 
             simtime_t delay = getDelay();
+            hist.collect(delay);
+            //vec.record(delay);
             scheduleAt(simTime() + delay, event);
 
             std::string buf;

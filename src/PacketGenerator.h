@@ -64,6 +64,9 @@ protected:
     int _sessionLength;
     PacketPriority _packetsPriority;
 
+    cHistogram hist;
+    cOutVector vec;
+
 
 };
 

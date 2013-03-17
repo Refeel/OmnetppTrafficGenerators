@@ -116,6 +116,11 @@ void PacketGenerator::forwardPacket(SimplePacket *sp) {
 
 void PacketGenerator::initialize() {
 
+    hist.setName("delayStats");
+    vec.setName("delayVec");
+    //hist.setRangeAutoUpper(0, 10, 1.5);
+
+
     this->event = new cMessage("event");
     this->generatedPacket = NULL;
 
@@ -137,6 +142,8 @@ void PacketGenerator::handleMessage(cMessage *msg) {
 
 
             simtime_t delay = getDelay();
+            hist.collect(delay);
+            vec.record(delay);
             scheduleAt(simTime() + delay, event);
 
             std::string buf;
@@ -162,6 +169,9 @@ void PacketGenerator::handleMessage(cMessage *msg) {
 }
 
 void PacketGenerator::finish() {
+
+    hist.recordAs("delays_count");
+
     if (this->generatedPacket != NULL)
         delete this->generatedPacket;
 }
