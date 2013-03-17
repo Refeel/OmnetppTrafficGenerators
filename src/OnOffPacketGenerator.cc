@@ -26,7 +26,7 @@ OnOffPacketGenerator::~OnOffPacketGenerator() {
 }
 
 simtime_t OnOffPacketGenerator::getDelay() {
-    simtime_t time = par("onOffDelayTime");
+    simtime_t time = pareto_shifted(1, 2, 0); //par("onOffDelayTime");
     return time;
 }
 
@@ -63,9 +63,9 @@ void OnOffPacketGenerator::handleMessage(cMessage *msg) {
 
                 forwardPacket(this->generatedPacket); // send to random node
 
-                hist.collect(delay.dbl() + sumDelay.dbl());
+                //hist.collect(delay.dbl() + sumDelay.dbl());
+                hist.collect(1.0 / delay.dbl());
                 //vec.record(delay.dbl() + sumDelay.dbl());
-                sumDelay = 0;
 
                 this->generatedPacket = NULL; // remove after send
 
@@ -73,8 +73,9 @@ void OnOffPacketGenerator::handleMessage(cMessage *msg) {
                 sprintf((char*) buf.c_str(), "Packet number %d generated with delay %lf", this->_packetsCount, delay.dbl());
                 EV << buf.c_str();
                 bubble(buf.c_str());
+
             } else {
-                sumDelay += delay;
+                hist.collect(0);
             }
 
             scheduleAt(simTime() + delay, event);

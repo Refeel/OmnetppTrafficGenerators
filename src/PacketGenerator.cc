@@ -117,6 +117,7 @@ void PacketGenerator::forwardPacket(SimplePacket *sp) {
 void PacketGenerator::initialize() {
 
     hist.setName("delayStats");
+    hist.setRangeAutoUpper(0,500,0.5);
     vec.setName("delayVec");
     //hist.setRangeAutoUpper(0, 10, 1.5);
 
