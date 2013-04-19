@@ -26,7 +26,7 @@ OnOffPacketGenerator::~OnOffPacketGenerator() {
 }
 
 simtime_t OnOffPacketGenerator::getDelay() {
-    simtime_t time = pareto_shifted(1, 2, 0); //par("onOffDelayTime");
+    simtime_t time = poisson(10); //par("onOffDelayTime");
     return time;
 }
 
@@ -63,8 +63,9 @@ void OnOffPacketGenerator::handleMessage(cMessage *msg) {
 
                 forwardPacket(this->generatedPacket); // send to random node
 
-                //hist.collect(delay.dbl() + sumDelay.dbl());
-                hist.collect(1.0 / delay.dbl());
+                hist.collect(delay.dbl() + sumDelay.dbl());
+                sumDelay = 0;
+//                hist.collect(delay.dbl());
                 //vec.record(delay.dbl() + sumDelay.dbl());
 
                 this->generatedPacket = NULL; // remove after send
@@ -75,7 +76,7 @@ void OnOffPacketGenerator::handleMessage(cMessage *msg) {
                 bubble(buf.c_str());
 
             } else {
-                hist.collect(0);
+//                hist.collect(0);
             }
 
             scheduleAt(simTime() + delay, event);
@@ -107,7 +108,8 @@ void OnOffPacketGenerator::updateState() {
         bubble(buf.c_str());
     }
     else if(simTime() >= _stateEndTime) {
-        this->_stateEndTime = simTime()+par("onOffStateDurationTime");
+        sumDelay = par("onOffStateDurationTime");
+        this->_stateEndTime = simTime()+sumDelay;
         if(this->_state == ON) {
             this->_state = OFF;
             sprintf((char*) buf.c_str(), "State changed to OFF, endTime = %lf \n", this->_stateEndTime.dbl());

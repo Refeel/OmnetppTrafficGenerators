@@ -27,7 +27,7 @@ PoissonPacketGenerator::~PoissonPacketGenerator() {
 }
 
 simtime_t PoissonPacketGenerator::getDelay() {
-    simtime_t time = poisson(10);//par("poissonDelayTime");
+    simtime_t time = poisson(40);//par("poissonDelayTime");
     return time;
 }
 
